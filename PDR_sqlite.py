@@ -675,10 +675,11 @@ con.commit()
 '''
 
 # Compute participant stats
-cur.execute("SELECT Participant,count(),100*count()/593.0,(julianday('2020-08-01')-julianday('now'))/(593.0-count()) FROM Beers GROUP BY Participant ORDER BY count() DESC")
+# Der er enten 592 eller 591 postnumre men ikke 593
+cur.execute("SELECT Participant,count(),100*count()/592.0,(julianday('2020-08-01')-julianday('now'))/(592.0-count()),date(julianday('2015-08-01')+592.0/count()*(julianday('now')-julianday('2015-08-01'))) FROM Beers GROUP BY Participant ORDER BY count() DESC")
 
 stats = pd.DataFrame(cur.fetchall())
-stats.columns = ["Navn","Postnumre","Dækning antal (%)","DPP*"]
+stats.columns = ["Navn","Postnumre","Dækning antal (%)","DPP*","EFD"]
 
 
 # Compute area visited
@@ -698,7 +699,7 @@ rate=pd.DataFrame(cur.fetchall())
 rate.columns = ["Navn","FIP","Points"]
 stats=pd.merge(stats,rate,on="Navn",how="outer")
 
-stats.columns = ["Navn","Postnumre","Area","Dækning antal (%)","DPP","Sidste 7 dage","FIP","Points"]
+stats.columns = ["Navn","Postnumre","Area","Dækning antal (%)","DPP","EFD","Sidste 7 dage","FIP","Points"]
 
 # Make a copy of stats to remove rows in
 stats_tmp = stats.copy(deep=True)
@@ -739,7 +740,7 @@ print('Green: '+green.encode('utf-8'))
 print('Polkadot: '+polka.encode('utf-8'))
 print('Red: '+red.encode('utf-8')+'\n\n')
 
-stats.columns = ["Navn","Postnumre","Dækning Areal (%)","Dækning antal (%)","DPP","Sidste 7 dage","FIP","Points"]
+stats.columns = ["Navn","Postnumre","Dækning Areal (%)","Dækning antal (%)","DPP","EFD","Sidste 7 dage","FIP","Points"]
 
 # '''+datetime.datetime.now().strftime("%Y-%m-%d %H:%M").encode('utf-8')+''
 s=u'''<link rel="stylesheet" type="text/css" href="table.css">
